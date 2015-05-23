@@ -84,8 +84,8 @@
   <ItemGroup>
     <Compile Include="CommandGuids.cs" />
     <Compile Include="ContentType.cs" />
-    <Compile Include="KeyBindingCommandFilter.cs" />
-    <Compile Include="KeyBindingFilterProvider.cs" />
+    <Compile Include="RstEditorCommands.cs" />
+    <Compile Include="RstEditorCreationListener.cs" />
     <Compile Include="RstEditorFormat.cs" />
     <Compile Include="RstEditorPackage.cs" />
     <Compile Include="RstEditorType.cs" />
@@ -113,6 +113,9 @@
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Notes.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

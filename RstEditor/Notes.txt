@@ -1,0 +1,13 @@
+﻿To add a format:
+
+- Add a format definition to RstEditorFormat.cs
+- Add a classification type definition to RstEditorTypes.cs
+- Call RstParser.CreateClassificationSpan to classify a span with this format
+
+
+To add a command:
+
+- Define a command ID in the CommandId enum
+- In the .vsct file, add the command ID in the <Symbols> section.
+- In the .vsct file, add a menu button in the <Buttons> section
+- Handle the command in RstEditorCommands.Exec

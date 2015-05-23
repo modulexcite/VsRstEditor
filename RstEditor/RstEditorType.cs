@@ -13,7 +13,6 @@ namespace RstEditor
         [Name("rst")]
         internal static ClassificationTypeDefinition RstClassificationDefinition = null;
 
-
         [Export]
         [Name("rst.italics")]
         [BaseDefinition("rst")]
@@ -23,5 +22,10 @@ namespace RstEditor
         [Name("rst.bold")]
         [BaseDefinition("rst")]
         internal static ClassificationTypeDefinition RstBoldClassificationDefinition = null;
+
+        [Export]
+        [Name("rst.literal")]
+        [BaseDefinition("rst")]
+        internal static ClassificationTypeDefinition RstLiteralClassificationDefinition = null;
     }
 }

@@ -23,7 +23,8 @@ namespace RstEditor
     enum CommandId
     {
         cmdidRstBold = 0x100,
-        cmdidRstItalic = 0x101
+        cmdidRstItalic = 0x101,
+        cmdidRstLiteral = 0x102
     }
 
 }

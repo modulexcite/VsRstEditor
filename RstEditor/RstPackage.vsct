@@ -32,6 +32,12 @@
           <ButtonText>Italic</ButtonText>
         </Strings>
       </Button>
+      <Button guid="CommandGroupGuid" id="cmdidRstLiteral" priority="0x0100" type="Button">
+        <Parent guid="CommandGroupGuid" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>Literal</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
   </Commands>
 
@@ -50,6 +56,7 @@
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidRstBold" value="0x0100" />
       <IDSymbol name="cmdidRstItalic" value="0x0101" />
+      <IDSymbol name="cmdidRstLiteral" value="0x0102" />
     </GuidSymbol>
   </Symbols>
 

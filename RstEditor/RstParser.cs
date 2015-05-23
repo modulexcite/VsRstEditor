@@ -17,20 +17,22 @@ namespace RstEditor
         const string non_whitespace_before = @"(?<![ \n])";                 // Pattern for enforcing non-whitespace before a match
                                                                             // BUGBUG Should include NULL character (for escape sequences)
 
-        const string inline_markup = @"(?<markup>\*\*|\*(?!\*))";           // Basic patterns for inline markup
+        const string inline_markup = @"(?<markup>\*\*|\*(?!\*)|``)";        // Basic patterns for inline markup
 
-        const string inline_end_suffix = @"($|(?=\s|[:/'""<)\]}]))";        // Inline markup must end with these restrictions
+        const string inline_end_suffix = @"($|(?=\s|[.,:;!?/'""<)\]}]))";   // Inline markup must end with these restrictions
 
         const string initial = inline_start_prefix + inline_markup + non_whitespace_after;      // Pattern to find possible inline markup
-        const string emphasis = non_whitespace_before + @"(\*)" + inline_end_suffix;            // Given possible inline markup, finds emphasis
         const string strong = non_whitespace_before + @"(\*\*)" + inline_end_suffix;            // Given possible inline markup, finds strong
+        const string emphasis = non_whitespace_before + @"(\*(?!\*))" + inline_end_suffix;      // ... finds emphasis
+        const string literal = non_whitespace_before + @"(``)" + inline_end_suffix;             // ... finds literal
 
         // These regexs are based loosely on docutils\parsers\rst\states.py in RST parser
 
 
         Regex startPattern = new Regex(initial);
-        Regex endEmphasis = new Regex(emphasis);
         Regex endStrong = new Regex(strong);
+        Regex endEmphasis = new Regex(emphasis);
+        Regex endLiteral = new Regex(literal);
 
         IClassificationTypeRegistryService _registry;
 
@@ -44,12 +46,14 @@ namespace RstEditor
 
             _lookups = new Dictionary<string, Regex> {
                 { "*", endEmphasis },
-                { "**", endStrong }
+                { "**", endStrong },
+                { "``", endLiteral }
             };
 
             _styles = new Dictionary<string, string> {
                 { "*", "rst.italics" },
-                { "**", "rst.bold" }
+                { "**", "rst.bold" },
+                { "``", "rst.literal" }
             };
 
         }
@@ -61,7 +65,7 @@ namespace RstEditor
 
             string text = paragraph.GetText();
 
-            ParseStrongAndEmphasis(text, paragraph, classifications);
+            ParseInlineMarkup(text, paragraph, classifications);
 
             return classifications;
         }
@@ -75,7 +79,7 @@ namespace RstEditor
         // TODO Handle escapes and quoted characters 
         // TODO Need to capture surrounding paragraph of snapshot?
 
-        void ParseStrongAndEmphasis(string text, SnapshotSpan paragraph, IList<ClassificationSpan> classifications)
+        void ParseInlineMarkup(string text, SnapshotSpan paragraph, IList<ClassificationSpan> classifications)
         {
             int pos = 0;
 

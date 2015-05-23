@@ -44,6 +44,17 @@ namespace RstEditor
         public RstBoldFormat() { this.IsBold = true; }
     }
 
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "rst.literal")]
+    [Name("rst.literal")]
+    sealed class RstLiteralFormat : ClassificationFormatDefinition
+    {
+        public RstLiteralFormat() 
+        {
+            this.FontTypeface = new Typeface("Courier New");
+            this.ForegroundColor = Color.FromRgb(43, 145, 175);
+        }
+    }
 
     #endregion //Format definition
 }

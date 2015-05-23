@@ -38,38 +38,39 @@ namespace RstEditor
 
         }
 
-        private void Bold()
+        private void AddInlineMarkupToSelection(string beginMarkup, string endMarkup, string undoDescription)
         {
             if (TextView.Selection.SelectedSpans.Count > 0)
             {
                 var start = TextView.Selection.Start.Position.Position;
                 var end = TextView.Selection.End.Position.Position;
 
-                UndoManager.OpenLinkedUndo((uint)LinkedTransactionFlags.mdtDefault, "Bold");
+                UndoManager.OpenLinkedUndo((uint)LinkedTransactionFlags.mdtDefault, undoDescription);
 
-                TextView.TextBuffer.Insert(end, "**");
-                TextView.TextBuffer.Insert(start, "**");
+                TextView.TextBuffer.Insert(end, endMarkup);
+                TextView.TextBuffer.Insert(start, beginMarkup);
 
                 UndoManager.CloseLinkedUndo();
             }
+        }
+
+
+#region Commands
+        private void Bold()
+        {
+            AddInlineMarkupToSelection("**", "**", "Bold");
         }
 
         private void Italic()
         {
-            if (TextView.Selection.SelectedSpans.Count > 0)
-            {
-                var start = TextView.Selection.Start.Position.Position;
-                var end = TextView.Selection.End.Position.Position;
-
-                UndoManager.OpenLinkedUndo((uint)LinkedTransactionFlags.mdtDefault, "Italic");
-
-                TextView.TextBuffer.Insert(end, "*");
-                TextView.TextBuffer.Insert(start, "*");
-
-                UndoManager.CloseLinkedUndo();
-            }
+            AddInlineMarkupToSelection("*", "*", "Italic");
         }
 
+        private void Literal()
+        {
+            AddInlineMarkupToSelection("``", "``", "Literal");
+        }
+#endregion
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
@@ -83,6 +84,10 @@ namespace RstEditor
 
                     case (uint)CommandId.cmdidRstItalic:
                         Italic();
+                        break;
+
+                    case (uint)CommandId.cmdidRstLiteral:
+                        Literal();
                         break;
                 }
 
