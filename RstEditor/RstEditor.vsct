@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+
+  <Commands package="guidRstEditorPkg">
+    <Menus>
+      <Menu guid="guidTopMenu" id="TopMenu" priority="0x700" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>Rst Editor</ButtonText>
+        </Strings>
+      </Menu>
+    </Menus>
+
+    <Groups>
+      <Group guid="guidRstEditorCmdSet" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="guidTopMenu" id="TopMenu"/>
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <Button guid="guidRstEditorCmdSet" id="cmdidMyCommand" priority="0x0100" type="Button">
+        <Parent guid="guidRstEditorCmdSet" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>My Command name</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+
+  <Symbols>
+    <GuidSymbol name="guidRstEditorPkg" value="{BC66DCF9-93F9-4DCE-BC78-6EE918FF83EF}" />
+
+    <GuidSymbol name="guidTopMenu" value="{B5EF1519-D54B-4923-A3B2-F131B2803B0B}">
+      <IDSymbol name="TopMenu" value="0x3001" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidRstEditorCmdSet" value="{887B87CC-9FD2-4B43-93E7-54C0FFE435EB}">
+      <IDSymbol name="MyMenuGroup" value="0x1020" />
+      <IDSymbol name="cmdidMyCommand" value="0x0100" />
+    </GuidSymbol>
+
+  </Symbols>
+
+</CommandTable>

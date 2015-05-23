@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Commands package="PackageGuid">
+
+    <Menus>
+      <Menu guid="TopMenuGuid" id="TopMenu" priority="0x700" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>RST Editor</ButtonText>
+        </Strings>
+      </Menu>
+    </Menus>
+    
+    <Groups>
+      <Group guid="CommandGroupGuid" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="TopMenuGuid" id="TopMenu"/>
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <Button guid="CommandGroupGuid" id="cmdidRstBold" priority="0x0100" type="Button">
+        <Parent guid="CommandGroupGuid" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>Bold</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="CommandGroupGuid" id="cmdidRstItalic" priority="0x0100" type="Button">
+        <Parent guid="CommandGroupGuid" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>Italic</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+
+  <Symbols>
+    <!-- This is the package guid. -->
+    <GuidSymbol name="PackageGuid" value="{d7948a57-4d5a-4efd-97f1-3df9f447a28c}" />
+
+
+    <GuidSymbol name="TopMenuGuid" value="{280E9AFD-B322-4463-B663-9FED3FB2BBBB}">
+      <IDSymbol name="TopMenu" value="0x3001" />
+    </GuidSymbol>
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="CommandGroupGuid" value="{c2503696-5187-4355-966d-29081b30368b}">
+      <IDSymbol name="MyMenuGroup" value="0x1020" />
+      <IDSymbol name="cmdidRstBold" value="0x0100" />
+      <IDSymbol name="cmdidRstItalic" value="0x0101" />
+    </GuidSymbol>
+  </Symbols>
+
+</CommandTable>
