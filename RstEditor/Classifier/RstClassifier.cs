@@ -9,58 +9,22 @@ using System.Text.RegularExpressions;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Design;
+using RstEditor.Extensions;
 
 
 // http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
 
-namespace RstEditor
+namespace RstEditor.Classifier
 {
-
-    #region Provider definition
-    /// <summary>
-    /// This class causes a classifier to be added to the set of classifiers. Since 
-    /// the content type is set to "text", this classifier applies to all text files
-    /// </summary>
-    [Export(typeof(IClassifierProvider))]
-    [ContentType("rst")]
-    internal class RstEditorProvider : IClassifierProvider
-    {
-        /// <summary>
-        /// Import the classification registry to be used for getting a reference
-        /// to the custom classification type later.
-        /// </summary>
-        [Import]
-        internal IClassificationTypeRegistryService ClassificationRegistry = null; // Set via MEF
-
-        [Import]
-        internal SVsServiceProvider ServiceProvider = null;
-
-        public IClassifier GetClassifier(ITextBuffer buffer)
-        {
-            OleMenuCommandService mcs = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (null != mcs)
-            {
-                ////    Create the command for the menu item.
-                //CommandID menuCommandID = new CommandID(CommandGuids.CmdSetGuid, (int)CommandId.cmdidMyCommand);
-                //MenuCommand menuItem = new MenuCommand((s, e) => { }, menuCommandID);
-                //mcs.AddCommand(menuItem);
-            }
-
-            return buffer.Properties.GetOrCreateSingletonProperty(() => new RstEditor(ClassificationRegistry));
-        }
-    }
-    #endregion //provider def
-
-    #region Classifier
     /// <summary>
     /// Classifier that classifies all text as an instance of the OrinaryClassifierType
     /// </summary>
-    class RstEditor : IClassifier
+    class RstClassifier : IClassifier
     {
         IClassificationTypeRegistryService _classificationRegistry;
         RstParser _parser;
 
-        internal RstEditor(IClassificationTypeRegistryService registry)
+        internal RstClassifier(IClassificationTypeRegistryService registry)
         {
             _classificationRegistry = registry;
 
@@ -75,10 +39,19 @@ namespace RstEditor
         /// <returns>A list of ClassificationSpans that represent spans identified to be of this classification</returns>
         public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
         {
+            //System.Diagnostics.Debug.WriteLine(">>>> GetClassificationSpans");
+            //System.Diagnostics.Debug.WriteLine(span.GetText());
+            //System.Diagnostics.Debug.WriteLine("<<<<");
+
+            span = span.GetEnclosingParagraph();
+
+            var t = span.GetText();
+
             var classifications = _parser.ParseParagraph(span);
 
             return classifications;
         }
+
 
 #pragma warning disable 67
         // This event gets raised if a non-text change would affect the classification in some way,
@@ -88,5 +61,4 @@ namespace RstEditor
 #pragma warning restore 67
 
     }
-    #endregion //Classifier
 }

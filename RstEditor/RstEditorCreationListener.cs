@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Text.Editor;
 
-
 namespace RstEditor
 {
     [Export(typeof(IVsTextViewCreationListener))]
@@ -16,10 +15,8 @@ namespace RstEditor
     [TextViewRole(PredefinedTextViewRoles.Editable)]
     class RstEditorCreationListener : IVsTextViewCreationListener
     {
-
         [Import(typeof(IVsEditorAdaptersFactoryService))]
         internal IVsEditorAdaptersFactoryService editorFactory = null;
-
 
         public void VsTextViewCreated(Microsoft.VisualStudio.TextManager.Interop.IVsTextView textViewAdapter)
         {

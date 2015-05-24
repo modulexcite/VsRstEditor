@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
 
-namespace RstEditor
+namespace RstEditor.Classifier
 {
     internal static class RstEditorClassificationDefinition
     {
