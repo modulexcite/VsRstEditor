@@ -8,9 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace RstEditor
+namespace RstEditor.Parser
 {
-    public class RstParser
+    class InlineMarkupParser : IParser
     {
         const string inline_start_prefix = @"(^|(?<=\s|[:/'""<([{]))";      // Inline markup must start with these restrictions
         const string non_whitespace_after = @"(?![ \n])";                   // Pattern for enforcing non-whitespace after a match
@@ -28,22 +28,16 @@ namespace RstEditor
 
         // These regexs are based loosely on docutils\parsers\rst\states.py in RST parser
 
-
         Regex startPattern = new Regex(initial);
         Regex endStrong = new Regex(strong);
         Regex endEmphasis = new Regex(emphasis);
         Regex endLiteral = new Regex(literal);
 
-        IClassificationTypeRegistryService _registry;
-
         Dictionary<string, Regex> _lookups;
-
         Dictionary<string, string> _styles;
 
-        public RstParser(IClassificationTypeRegistryService registry)
+        public InlineMarkupParser()
         {
-            _registry = registry;
-
             _lookups = new Dictionary<string, Regex> {
                 { "*", endEmphasis },
                 { "**", endStrong },
@@ -58,31 +52,11 @@ namespace RstEditor
 
         }
 
-        public List<ClassificationSpan> ParseParagraph(SnapshotSpan paragraph)
+        public void Parse(SnapshotSpan paragraph, IClassificationTypeRegistryService registry, List<ClassificationSpan> classifications)
         {
-            //create a list to hold the results
-            List<ClassificationSpan> classifications = new List<ClassificationSpan>();
-
             string text = paragraph.GetText();
 
-            ParseInlineMarkup(text, paragraph, classifications);
-
-            return classifications;
-        }
-
-        ClassificationSpan CreateClassificationSpan(SnapshotPoint start, int len, string classificationType)
-        {
-            return new ClassificationSpan(new SnapshotSpan(start, len), _registry.GetClassificationType(classificationType));
-        }
-
-
-        // TODO Handle escapes and quoted characters 
-        // TODO Need to capture surrounding paragraph of snapshot?
-
-        void ParseInlineMarkup(string text, SnapshotSpan paragraph, IList<ClassificationSpan> classifications)
-        {
             int pos = 0;
-
             while (pos < text.Length)
             {
                 Match m = startPattern.Match(text, pos);
@@ -98,13 +72,15 @@ namespace RstEditor
                     Match m2 = regex.Match(text, matchStart);
                     if (m2.Success)
                     {
-                        var span = CreateClassificationSpan(paragraph.Start + matchStart, m2.Index - matchStart, _styles[markup]);
-                        classifications.Add(span);
+                        var classification = registry.GetClassificationType(_styles[markup]);
+                        var snapshotSpan = new SnapshotSpan(paragraph.Start + matchStart, m2.Index - matchStart);
+
+                        classifications.Add(new ClassificationSpan(snapshotSpan, classification));
                         pos = m2.Index + m2.Length;
                     }
                     else
                     {
-                        Trace.TraceWarning("Start string without end string");
+                        //Trace.TraceWarning("Start string without end string");
                         pos = text.IndexOf('\n', pos + 1);
                         if (pos == -1)
                         {
@@ -118,7 +94,6 @@ namespace RstEditor
                 }
             }
         }
-
 
     }
 }

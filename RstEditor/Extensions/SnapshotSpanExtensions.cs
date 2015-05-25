@@ -18,40 +18,31 @@ namespace RstEditor.Extensions
             int endLineNumber = (span.End <= startLine.EndIncludingLineBreak) ? startLineNumber : snapshot.GetLineNumberFromPosition(span.End);
 
             // Find the first/last empty line
-            bool foundEmpty = false;
             while (startLineNumber > 0)
             {
                 bool lineEmpty = snapshot.GetLineFromLineNumber(startLineNumber).GetText().Trim().Length == 0;
-
                 if (lineEmpty)
-                {
-                    foundEmpty = true;
-                }
-                else if (foundEmpty)
                 {
                     startLineNumber++;
                     break;
                 }
-
                 startLineNumber--;
             }
 
-            foundEmpty = false;
             while (endLineNumber < snapshot.LineCount - 1)
             {
                 bool lineEmpty = snapshot.GetLineFromLineNumber(endLineNumber).GetText().Trim().Length == 0;
-
                 if (lineEmpty)
-                {
-                    foundEmpty = true;
-                }
-                else if (foundEmpty)
                 {
                     endLineNumber--;
                     break;
                 }
-
                 endLineNumber++;
+            }
+
+            if (endLineNumber < startLineNumber)
+            {
+                return span;
             }
 
             // Generate a string for this paragraph chunk
@@ -60,6 +51,5 @@ namespace RstEditor.Extensions
 
             return new SnapshotSpan(startPoint, endPoint);
         }
-
     }
 }

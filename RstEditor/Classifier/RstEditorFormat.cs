@@ -32,4 +32,27 @@ namespace RstEditor.Classifier
             this.ForegroundColor = Color.FromRgb(43, 145, 175);
         }
     }
+
+
+    //[Export(typeof(EditorFormatDefinition))]
+    //[ClassificationType(ClassificationTypeNames = "rst.header")]
+    //[Name("rst.header")]
+    //[UserVisible(true)]
+    //sealed class RstHeaderFormat : ClassificationFormatDefinition
+    //{
+    //    public RstHeaderFormat() { this.ForegroundColor = Colors.MediumPurple; }
+    //}
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "rst.header.h1")]
+    [Name("rst.header.h1")]
+    sealed class RstH1Format : ClassificationFormatDefinition
+    {
+        public RstH1Format() {
+            this.ForegroundColor = Colors.MediumPurple;
+            this.FontRenderingSize = 22; 
+        }
+    }
+
+
 }

@@ -16,8 +16,4 @@ namespace RstEditor
         [ContentType("rst")]
         internal static FileExtensionToContentTypeDefinition hiddenFileExtensionDefinition = null;
     }
-
-
-
-
 }

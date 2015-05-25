@@ -10,6 +10,7 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using System.ComponentModel.Design;
 using RstEditor.Extensions;
+using RstEditor.Parser;
 
 
 // http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
@@ -22,14 +23,34 @@ namespace RstEditor.Classifier
     class RstClassifier : IClassifier
     {
         IClassificationTypeRegistryService _classificationRegistry;
-        RstParser _parser;
+        ITextBuffer _buffer;
 
-        internal RstClassifier(IClassificationTypeRegistryService registry)
+        List<IParser> _parsers = new List<IParser>() {
+            new HeadingParser(),
+            new InlineMarkupParser()
+        };
+
+        internal RstClassifier(ITextBuffer buffer, IClassificationTypeRegistryService registry)
         {
             _classificationRegistry = registry;
-
-            _parser = new RstParser(_classificationRegistry);
+            _buffer = buffer;
+            _buffer.Changed += OnTextBufferChanged;
         }
+
+        void OnTextBufferChanged(object sender, TextContentChangedEventArgs e)
+        {
+            var handler = this.ClassificationChanged;
+            if (handler != null)
+            {
+                // For now raise the event for the entire changed buffer.
+                var span = new SnapshotSpan(_buffer.CurrentSnapshot, 0, _buffer.CurrentSnapshot.Length);
+
+                handler(this, new ClassificationChangedEventArgs(span));
+            }
+        }
+
+        public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
+
 
         /// <summary>
         /// This method scans the given SnapshotSpan for potential matches for this classification.
@@ -39,26 +60,16 @@ namespace RstEditor.Classifier
         /// <returns>A list of ClassificationSpans that represent spans identified to be of this classification</returns>
         public IList<ClassificationSpan> GetClassificationSpans(SnapshotSpan span)
         {
-            //System.Diagnostics.Debug.WriteLine(">>>> GetClassificationSpans");
-            //System.Diagnostics.Debug.WriteLine(span.GetText());
-            //System.Diagnostics.Debug.WriteLine("<<<<");
-
             span = span.GetEnclosingParagraph();
 
-            var t = span.GetText();
+            List<ClassificationSpan> classifications = new List<ClassificationSpan>();
 
-            var classifications = _parser.ParseParagraph(span);
-
+            foreach (var parser in _parsers)
+            {
+                parser.Parse(span, _classificationRegistry, classifications);
+            }
             return classifications;
         }
-
-
-#pragma warning disable 67
-        // This event gets raised if a non-text change would affect the classification in some way,
-        // for example typing /* would cause the classification to change in C# without directly
-        // affecting the span.
-        public event EventHandler<ClassificationChangedEventArgs> ClassificationChanged;
-#pragma warning restore 67
 
     }
 }

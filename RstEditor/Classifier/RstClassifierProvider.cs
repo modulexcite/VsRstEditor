@@ -32,16 +32,7 @@ namespace RstEditor.Classifier
 
         public IClassifier GetClassifier(ITextBuffer buffer)
         {
-            OleMenuCommandService mcs = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (null != mcs)
-            {
-                ////    Create the command for the menu item.
-                //CommandID menuCommandID = new CommandID(CommandGuids.CmdSetGuid, (int)CommandId.cmdidMyCommand);
-                //MenuCommand menuItem = new MenuCommand((s, e) => { }, menuCommandID);
-                //mcs.AddCommand(menuItem);
-            }
-
-            return buffer.Properties.GetOrCreateSingletonProperty(() => new RstClassifier(ClassificationRegistry));
+            return buffer.Properties.GetOrCreateSingletonProperty(() => new RstClassifier(buffer, ClassificationRegistry));
         }
     }
 
