@@ -26,84 +26,123 @@ namespace RstEditor.Parser
         // Text1 => Underline   (text1 was a title)
         // Text1 => Text  
 
-        enum HeaderStates { Start, Overline, Underline, Text1, Text, Title, Error };
+        enum HeaderState { Start, Overline, Underline, Text1, Text, Title, Error };
 
-        bool hasUnderline;
+        IClassificationTypeRegistryService _registry;
+        List<ClassificationSpan> _classifications;
+
         char heading;
         string lineText;
+        
         ITextSnapshotLine title;
+        ITextSnapshotLine overline;
+        ITextSnapshotLine underline;
+
         ITextSnapshotLine line;
 
-        HeaderStates TransitionOnMatch(HeaderStates state)
+        HeaderState TransitionAdornmentLine(HeaderState state)
         {
             switch (state)
             {
-                case HeaderStates.Start:
+                case HeaderState.Start:
                     heading = lineText[0];
-                    return HeaderStates.Overline;
+                    overline = line;
+                    return HeaderState.Overline;
 
-                case HeaderStates.Text1:
+                case HeaderState.Text1:
                     // TODO: Check lengths
-                    hasUnderline = true;
-                    return HeaderStates.Underline;
+                    underline = line;
+                    return HeaderState.Underline;
 
-                case HeaderStates.Title:
+                case HeaderState.Title:
                     if (lineText[0] == heading)
                     {
                         // TODO: Check lengths
-                        hasUnderline = true;
-                        return HeaderStates.Underline;
+                        underline = line;
+                        return HeaderState.Underline;
                     }
                     else
                     {
-                        return HeaderStates.Error;
+                        return HeaderState.Error;  // Overline does not match underline
                     }
-                default:
-                    return HeaderStates.Error;
+                default:   // If state is overline or underline, then we have two consecutive adornment lines 
+                    return HeaderState.Error;
             }
         }
 
-        HeaderStates TransitionOnNoMatch(HeaderStates state)
+        HeaderState TransitionTextLine(HeaderState state)
         {
             switch (state)
             {
-                case HeaderStates.Start:
+                case HeaderState.Start:
                     title = line;  // May be a title
-                    return state = HeaderStates.Text1;
+                    return state = HeaderState.Text1;
 
-                case HeaderStates.Overline:
+                case HeaderState.Overline:
                     title = line;
-                    return HeaderStates.Title;
+                    return HeaderState.Title;
 
-                case HeaderStates.Underline:
-                    return HeaderStates.Text;
+                case HeaderState.Underline:
+                    CreateClassificationSpan();
+                    title = line;  // This may be the start of another title
+                    return HeaderState.Text1;
 
-                case HeaderStates.Text1:
+                case HeaderState.Text1:
                     title = null;   // First line was not a title
-                    return HeaderStates.Text;
+                    return HeaderState.Text;
 
-                case HeaderStates.Text:
+                case HeaderState.Text:
                     // no-op
-                    return HeaderStates.Text;
+                    return HeaderState.Text;
 
-                case HeaderStates.Title:
-                    return HeaderStates.Error; // Multi-line titles are not allowed
+                case HeaderState.Title:
+                    return HeaderState.Error; // Multi-line titles are not allowed
 
                 default:
-                    return HeaderStates.Error;
+                    return HeaderState.Error;
             }
+        }
+
+
+        void CreateClassificationSpan()
+        {
+            if (title != null && underline != null)
+            {
+                var type = _registry.GetClassificationType("rst.header.h1");
+
+                var start = title.Start;
+                var len = title.LengthIncludingLineBreak + underline.LengthIncludingLineBreak;
+
+                if (overline != null)
+                {
+                    start = overline.Start;
+                    len += overline.LengthIncludingLineBreak;
+                }
+
+                var span = new ClassificationSpan(new SnapshotSpan(start, len), type);
+                _classifications.Add(span);
+            }
+
+            // Reset
+            title = null;
+            underline = null;
+            overline = null;
         }
 
         public void Parse(SnapshotSpan paragraph, IClassificationTypeRegistryService registry, List<ClassificationSpan> classifications)
         {
-            var state = HeaderStates.Start;
+            _registry = registry;
+            _classifications = classifications;
+
+            var state = HeaderState.Start;
 
             var startLine = paragraph.Start.GetContainingLine().LineNumber;
             var endLine = paragraph.End.GetContainingLine().LineNumber;
 
             heading = '\0';
             title = null;
-            hasUnderline = false;
+            overline = null;
+            underline = null;
 
             for (int i = startLine; i <= endLine; i++)
             {
@@ -111,19 +150,14 @@ namespace RstEditor.Parser
                 lineText = line.GetText();
                 var match = Regex.Match(lineText, adornment);
                 
-                state = match.Success ? TransitionOnMatch(state) : TransitionOnNoMatch(state);
-                if (state == HeaderStates.Error)
+                state = match.Success ? TransitionAdornmentLine(state) : TransitionTextLine(state);
+                if (state == HeaderState.Error || state == HeaderState.Text)
                 {
                     break;
                 }
             }
-            if (title != null && hasUnderline)
-            {
-                var type = registry.GetClassificationType("rst.header.h1");
-                var span = new ClassificationSpan(new SnapshotSpan(title.Start, title.Length), type);
-                classifications.Add(span);
-            }
-        
+
+            CreateClassificationSpan();
         }
     }
 }
