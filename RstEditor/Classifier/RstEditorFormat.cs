@@ -34,25 +34,36 @@ namespace RstEditor.Classifier
     }
 
 
-    //[Export(typeof(EditorFormatDefinition))]
-    //[ClassificationType(ClassificationTypeNames = "rst.header")]
-    //[Name("rst.header")]
-    //[UserVisible(true)]
-    //sealed class RstHeaderFormat : ClassificationFormatDefinition
-    //{
-    //    public RstHeaderFormat() { this.ForegroundColor = Colors.MediumPurple; }
-    //}
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "rst.header")]
+    [Name("rst.header")]
+    [UserVisible(true)]
+    sealed class RstHeaderFormat : ClassificationFormatDefinition
+    {
+        public RstHeaderFormat() { this.ForegroundColor = Colors.MediumPurple; }
+    }
 
     [Export(typeof(EditorFormatDefinition))]
     [ClassificationType(ClassificationTypeNames = "rst.header.h1")]
     [Name("rst.header.h1")]
     sealed class RstH1Format : ClassificationFormatDefinition
     {
-        public RstH1Format() {
-            this.ForegroundColor = Colors.MediumPurple;
-            this.FontRenderingSize = 22; 
-        }
+        public RstH1Format() { this.FontRenderingSize = 22; }
     }
 
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "rst.header.h2")]
+    [Name("rst.header.h2")]
+    sealed class RstH2Format : ClassificationFormatDefinition
+    {
+        public RstH2Format() { this.FontRenderingSize = 20; }
+    }
 
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "rst.header.h3")]
+    [Name("rst.header.h3")]
+    sealed class RstH3Format : ClassificationFormatDefinition
+    {
+        public RstH3Format() { this.FontRenderingSize = 18; }
+    }
 }

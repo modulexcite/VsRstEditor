@@ -28,15 +28,24 @@ namespace RstEditor.Classifier
         [BaseDefinition("rst")]
         internal static ClassificationTypeDefinition RstLiteralClassificationDefinition = null;
 
-        //[Export]
-        //[Name("rst.header")]
-        //[BaseDefinition("rst")]
-        //internal static ClassificationTypeDefinition RstHeaderDefinition = null;
+        [Export]
+        [Name("rst.header")]
+        [BaseDefinition("rst")]
+        internal static ClassificationTypeDefinition RstHeaderDefinition = null;
 
         [Export]
         [Name("rst.header.h1")]
-        [BaseDefinition("rst")]
+        [BaseDefinition("rst.header")]
         internal static ClassificationTypeDefinition RstH1Definition = null;
 
+        [Export]
+        [Name("rst.header.h2")]
+        [BaseDefinition("rst.header")]
+        internal static ClassificationTypeDefinition RstH2Definition = null;
+
+        [Export]
+        [Name("rst.header.h3")]
+        [BaseDefinition("rst.header")]
+        internal static ClassificationTypeDefinition RstH3Definition = null;
     }
 }

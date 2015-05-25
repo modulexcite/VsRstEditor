@@ -11,6 +11,12 @@ namespace RstEditor.Parser
 {
     class HeadingParser : IParser
     {
+        // TODO:
+        // Check line lengths
+        // Format by heading level
+        // Remember to treat overlines as separate heading levels!
+        // Merge Error and Text states into a single Halt state
+
         const string adornment = @"(^[!""#$%&'()*+,-./:;<=>?@[\\\]^_`{\|}~])\1* *$";
 
         // This is a paragraph, so here are the cases:
@@ -40,6 +46,22 @@ namespace RstEditor.Parser
 
         ITextSnapshotLine line;
 
+        // BUGBUG This should be a lookup table and configurable. OK for now.
+        IClassificationType GetClassificationType()
+        {
+            switch (heading)
+            {
+                case '=':
+                    return _registry.GetClassificationType("rst.header.h1");
+
+                case '-':
+                    return _registry.GetClassificationType("rst.header.h2");
+
+                default:
+                    return _registry.GetClassificationType("rst.header.h3");
+            }
+        }
+
         HeaderState TransitionAdornmentLine(HeaderState state)
         {
             switch (state)
@@ -52,6 +74,7 @@ namespace RstEditor.Parser
                 case HeaderState.Text1:
                     // TODO: Check lengths
                     underline = line;
+                    heading = lineText[0];
                     return HeaderState.Underline;
 
                 case HeaderState.Title:
@@ -108,8 +131,6 @@ namespace RstEditor.Parser
         {
             if (title != null && underline != null)
             {
-                var type = _registry.GetClassificationType("rst.header.h1");
-
                 var start = title.Start;
                 var len = title.LengthIncludingLineBreak + underline.LengthIncludingLineBreak;
 
@@ -119,6 +140,7 @@ namespace RstEditor.Parser
                     len += overline.LengthIncludingLineBreak;
                 }
 
+                var type = GetClassificationType();
                 var span = new ClassificationSpan(new SnapshotSpan(start, len), type);
                 _classifications.Add(span);
             }
@@ -156,7 +178,6 @@ namespace RstEditor.Parser
                     break;
                 }
             }
-
             CreateClassificationSpan();
         }
     }
