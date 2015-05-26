@@ -91,6 +91,7 @@
     <Compile Include="ContentType.cs" />
     <Compile Include="Extensions\SnapshotSpanExtensions.cs" />
     <Compile Include="Parser\HeadingParser.cs" />
+    <Compile Include="Parser\HyperlinkParser.cs" />
     <Compile Include="Parser\InineMarkupParser.cs" />
     <Compile Include="Parser\IParser.cs" />
     <Compile Include="RstEditorCreationListener.cs" />

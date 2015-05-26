@@ -27,7 +27,8 @@ namespace RstEditor.Classifier
 
         List<IParser> _parsers = new List<IParser>() {
             new HeadingParser(),
-            new InlineMarkupParser()
+            new InlineMarkupParser(),
+            new HyperlinkParser()
         };
 
         internal RstClassifier(ITextBuffer buffer, IClassificationTypeRegistryService registry)

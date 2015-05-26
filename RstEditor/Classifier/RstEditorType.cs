@@ -47,5 +47,10 @@ namespace RstEditor.Classifier
         [Name("rst.header.h3")]
         [BaseDefinition("rst.header")]
         internal static ClassificationTypeDefinition RstH3Definition = null;
+
+        [Export]
+        [Name("rst.hyperlink")]
+        [BaseDefinition("rst")]
+        internal static ClassificationTypeDefinition RstHyperlinkDefinition = null;
     }
 }

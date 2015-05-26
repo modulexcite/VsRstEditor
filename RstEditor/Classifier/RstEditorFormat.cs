@@ -66,4 +66,12 @@ namespace RstEditor.Classifier
     {
         public RstH3Format() { this.FontRenderingSize = 18; }
     }
+
+    [Export(typeof(EditorFormatDefinition))]
+    [ClassificationType(ClassificationTypeNames = "rst.hyperlink")]
+    [Name("rst.hyperlink")]
+    sealed class RstHyperlinkFormat : ClassificationFormatDefinition
+    {
+        public RstHyperlinkFormat() { this.ForegroundColor = Colors.Blue; }
+    }
 }
