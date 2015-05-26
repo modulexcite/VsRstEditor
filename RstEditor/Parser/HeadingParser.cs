@@ -32,7 +32,7 @@ namespace RstEditor.Parser
         // Text1 => Underline   (text1 was a title)
         // Text1 => Text  
 
-        enum HeaderState { Start, Overline, Underline, Text1, Text, Title, Error };
+        enum HeaderState { Start, Overline, Underline, Text1, Text, Title };
 
         IClassificationTypeRegistryService _registry;
         List<ClassificationSpan> _classifications;
@@ -72,24 +72,32 @@ namespace RstEditor.Parser
                     return HeaderState.Overline;
 
                 case HeaderState.Text1:
-                    // TODO: Check lengths
-                    underline = line;
-                    heading = lineText[0];
-                    return HeaderState.Underline;
+                    if (line.Length >= title.Length)
+                    {
+                        underline = line;
+                        heading = lineText[0];
+                        return HeaderState.Underline;
+                    }
+                    else
+                    {
+                        return HeaderState.Text;
+                    }
 
                 case HeaderState.Title:
-                    if (lineText[0] == heading)
+                    if (lineText[0] == heading && 
+                        line.Length == overline.Length && 
+                        line.Length >= title.Length)
                     {
-                        // TODO: Check lengths
                         underline = line;
                         return HeaderState.Underline;
                     }
                     else
                     {
-                        return HeaderState.Error;  // Overline does not match underline
+                        return HeaderState.Text;  // Overline does not match underline or is too short
                     }
+
                 default:   // If state is overline or underline, then we have two consecutive adornment lines 
-                    return HeaderState.Error;
+                    return HeaderState.Text;
             }
         }
 
@@ -119,10 +127,10 @@ namespace RstEditor.Parser
                     return HeaderState.Text;
 
                 case HeaderState.Title:
-                    return HeaderState.Error; // Multi-line titles are not allowed
+                    return HeaderState.Text; // Multi-line titles are not allowed
 
                 default:
-                    return HeaderState.Error;
+                    return HeaderState.Text;
             }
         }
 
@@ -173,7 +181,7 @@ namespace RstEditor.Parser
                 var match = Regex.Match(lineText, adornment);
                 
                 state = match.Success ? TransitionAdornmentLine(state) : TransitionTextLine(state);
-                if (state == HeaderState.Error || state == HeaderState.Text)
+                if (state == HeaderState.Text)
                 {
                     break;
                 }
